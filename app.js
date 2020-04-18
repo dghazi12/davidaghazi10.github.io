@@ -10,61 +10,118 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
 
-function promptUser() {
-    return inquirer.prompt([
+async function totalEmployees() {
+    console.log("Let's begin creating your team!");
+
+    let teamSize;
+
+    await inquirer.prompt(
         {
-            type: "checkbox",
-            message: "Please select the following that best applies to you.",
-            name: "title",
-            choices:[
-            "Manager",
-            "Engineer",
-            "Intern",
-        ]
-        },
-        {
-            name: "name",
-            message: "What is your name?"
-        },
-        {
-            name: "ID",
-            message: "What is your company ID number?"
-        },
-        {
-            name: "email",
-            message: "What is your email address?"
-        },
-        {
-            //Only applies to manager
-            name: "office",
-            message: "What is your office number?"
-        },
-        {
-            //Only applies to engineers
-            name: "github",
-            message: "What is your GitHub username?"
-        },
-        {
-            //Only applies to Interns
-            name: "school",
-            message: "What is the name of the school you are currently attending?"
+            type: 'number',
+            message: 'How many team members would you like to include in your Employee Summary?',
+            name: "total"
         }
-    ]);
+    ).then((data) => {
+        teamSize = data.total
+
+        if (teamSize === 0) {
+            console.log("This is not a very impressive team :(");
+            return;
+        }
+
+        mainQuestions()
+
+    });
+
 }
 
-async function init() {
-    console.log("hi")
-    try {
-        const answers = await promptUser();
+function employees() {
+    return inquirer.prompt([
+        {
+            message: "What is your name?",
+            name: "name"
+        },
+        {
+            message: "What is your company ID?",
+            name: "id"
+        },
+        {
+            message: "What is your email address?",
+            name: "email"
+        }
+    ]);
 
-        console.log(answers)
+}
+
+async function mainQuestions() {
+    try {
+        const mainAnswers = await employees();
+        role()
+
+        // console.log(mainAnswers)
 
     } catch (err) {
         console.log(err);
     }
 }
 
-init();
+totalEmployees()
+
+function role() {
+
+    inquirer.prompt(
+        {
+            type: "checkbox",
+            message: "Please select the following that best applies to you.",
+            name: "title",
+            choices: [
+                "Manager",
+                "Engineer",
+                "Intern",
+            ]
+        }
+    ).then ((res) => {
+
+        let title = res.title.toString();
+
+        if (title === "Manager"){
+            inquirer.prompt(
+                {
+                    message: "What is your office number?",
+                    name: "office"
+                }).then((data) => {
+                    console.log(data.office)
+                })
+        }else if (title === "Engineer") {
+            inquirer.prompt(
+                {
+                    message: "What is your GitHub username?",
+                    name: "github"
+                }).then((data) => {
+                    console.log(data.github)
+                })
+        }else {
+            inquirer.prompt(
+                {
+                    message: "What is the name of your school?",
+                    name: "school"
+                }).then((data) => {
+                    console.log(data.school)
+                })
+        }
+
+    });
+
+}
+
+
+
+
+// Create a prompt that asks how many employees are on the team;
+// Have to create a loop that will ask all of the employee class questions - this is where I will wrap the prompt in the employee class
+// After that, it will what their role is.
+// It will prompt a question based on that role that will be sent to the specific class. 
+
 
 
 

@@ -10,132 +10,146 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
 
-let teamSize;
-let i = 0;
+let results = [];
 
-let results = []
+async function employee() {
 
-function checkTeamSize(){
-    if (i < teamSize){
-        i++;
-        console.log("Please input information for the new team member!")
-        mainQuestions()
-    }else if (teamSize === 0) {
-        console.log("This is not a very impressive team :(");
-    }else{
-        console.log(results)
-        console.log("Your team is built!")
+    await inquirer.prompt([
 
-        employeeInfo = render(results);
-        fs.writeFile("./output/team.html", employeeInfo, err => {
-        if (err) {
-            throw err;
-        } console.log("Successfully written to team.html file");
-        })
-    }
-}
-
-async function totalEmployees() {
-    console.log("Let's begin creating your team!");
-
-    await inquirer.prompt(
         {
-            type: 'number',
-            message: 'How many team members would you like to include in your Employee Summary?',
-            name: "total"
-        }
-    ).then((data) => {
-        teamSize = data.total
-        checkTeamSize()
-        
-    });
-
-}
-
-function employees() {
-    return inquirer.prompt([
-        {
-            message: "What is your name?",
+            message: "Please enter name.",
             name: "name"
         },
         {
-            message: "What is your company ID?",
+            message: "Please enter company ID.",
             name: "id"
         },
         {
-            message: "What is your email address?",
+            message: "Please enter an email address.",
             name: "email"
+        },
+        {
+            type: "list",
+            message: "What is their role in the company?",
+            name: "role",
+            choices: ["Manager", "Engineer", "Intern"]
         }
-    ]).then ((res) => {
-        let employee = [res.name,res.id, res.email]
-        results.push(...employee)
+
+    ]).then((data) => {
+
+        name = data.name;
+        id = data.id;
+        role = data.role;
+        email = data.email;
+
+    })
+
+    switch (role) {
+
+        case "Manager":
+
+            await inquirer.prompt([
+
+                {
+                    message: "What is the office number of the Manager?",
+                    name: "officeNumber"
+                }
+
+            ]).then((data) => {
+
+                const manager = new Manager(name, id, email, data.officeNumber)
+                results.push(manager)
+
+                teamMember()
+                renderResults()
+
+            })
+
+        break;
+
+        case "Engineer":
+
+            await inquirer.prompt([
+
+                {
+                    message: "What is the GitHub username of the Engineer?",
+                    name: "github"
+                }
+
+            ]).then((data) => {
+
+                const engineer = new Engineer(name, id, email, data.github)
+                results.push(engineer)
+
+                teamMember()
+                renderResults()
+
+            })
+
+        break;
+
+        case "Intern":
+
+            await inquirer.prompt([
+                {
+                    message: "What is the name of the school the Intern is attending?",
+                    name: "school"
+                }
+
+            ]).then((data) => {
+
+                const intern = new Intern(name, id, email, data.school)
+                results.push(intern)
+
+                teamMember()
+                renderResults()
+
+            })
+
+        break;
+
+    }
+
+}
+
+employee();
+
+function teamMember() {
+
+    inquirer.prompt([
+
+        {
+            type: "list",
+            message: "Would you like to add another team member?",
+            name: "addmember",
+            choices: ["Yes", "No"]
+        }
+
+    ]).then((data) => {
+
+        if (data.addmember === "Yes") {
+
+            console.log("Enter new members information below!")
+            employee()
+
+        }else{ 
+            console.log("Your team is built!!!")
+        }
+
     })
 
 }
 
-async function mainQuestions() {
-    try {
-        await employees();
-        role()
+function renderResults() {
 
-    } catch (err) {
-        console.log(err);
-    }
-}
+    teamInfo = render(results);
 
-totalEmployees()
+    fs.writeFile("./output/team.html", teamInfo, err => {
 
-function role() {
-
-    inquirer.prompt(
-        {
-            type: "checkbox",
-            message: "Please select the following that best applies to you.",
-            name: "role",
-            choices: [
-                "Manager",
-                "Engineer",
-                "Intern",
-            ]
-        }
-    ).then ((res) => {
-
-        let role = (res.role).toString();
-        results.push(role)
-
-        if (role === "Manager"){
-            inquirer.prompt(
-                {
-                    message: "What is your office number?",
-                    name: "officeNumber"
-                }).then((data) => {
-                    results.push(data.officeNumber)
-                    checkTeamSize()
-
-                })
-        }else if (role === "Engineer") {
-            inquirer.prompt(
-                {
-                    message: "What is your GitHub username?",
-                    name: "github"
-                }).then((data) => {
-                    results.push(data.github)
-                    checkTeamSize()
-
-                })
-        }else {
-            inquirer.prompt(
-                {
-                    message: "What is the name of your school?",
-                    name: "school"
-                }).then((data) => {
-                    results.push(data.school)
-                    checkTeamSize()
-
-                })
-                
+        if (err) {
+            throw err;
         }
 
-    });
+    })
 
 }

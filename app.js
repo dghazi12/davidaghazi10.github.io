@@ -10,10 +10,23 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
 
+let teamSize;
+let i = 0;
+
+function checkTeamSize(){
+    if (i < teamSize){
+        i++;
+        console.log("Please input information for the new team member!")
+        mainQuestions()
+    }else if (teamSize === 0) {
+        console.log("This is not a very impressive team :(");
+    }else{
+        console.log("Your team is built!")
+    }
+}
+
 async function totalEmployees() {
     console.log("Let's begin creating your team!");
-
-    let teamSize;
 
     await inquirer.prompt(
         {
@@ -23,14 +36,8 @@ async function totalEmployees() {
         }
     ).then((data) => {
         teamSize = data.total
-
-        if (teamSize === 0) {
-            console.log("This is not a very impressive team :(");
-            return;
-        }
-
-        mainQuestions()
-
+        checkTeamSize()
+        
     });
 
 }
@@ -55,10 +62,8 @@ function employees() {
 
 async function mainQuestions() {
     try {
-        const mainAnswers = await employees();
-        role()
-
-        // console.log(mainAnswers)
+        await employees();
+        getRole()
 
     } catch (err) {
         console.log(err);
@@ -67,7 +72,7 @@ async function mainQuestions() {
 
 totalEmployees()
 
-function role() {
+function getRole() {
 
     inquirer.prompt(
         {
@@ -90,7 +95,8 @@ function role() {
                     message: "What is your office number?",
                     name: "office"
                 }).then((data) => {
-                    console.log(data.office)
+                    checkTeamSize()
+                    
                 })
         }else if (title === "Engineer") {
             inquirer.prompt(
@@ -98,7 +104,8 @@ function role() {
                     message: "What is your GitHub username?",
                     name: "github"
                 }).then((data) => {
-                    console.log(data.github)
+                    checkTeamSize()
+
                 })
         }else {
             inquirer.prompt(
@@ -106,7 +113,8 @@ function role() {
                     message: "What is the name of your school?",
                     name: "school"
                 }).then((data) => {
-                    console.log(data.school)
+                    checkTeamSize()
+
                 })
         }
 
@@ -114,36 +122,5 @@ function role() {
 
 }
 
-
-
-
-// Create a prompt that asks how many employees are on the team;
-// Have to create a loop that will ask all of the employee class questions - this is where I will wrap the prompt in the employee class
-// After that, it will what their role is.
-// It will prompt a question based on that role that will be sent to the specific class. 
-
-
-
-
-// Write code to use inquirer to gather information about the development team members,
-// and to create objects for each team member (using the correct classes as blueprints!)
-
-// After the user has input all employees desired, call the `render` function (required
-// above) and pass in an array containing all employee objects; the `render` function will
-// generate and return a block of HTML including templated divs for each employee!
-
-// After you have your html, you're now ready to create an HTML file using the HTML
-// returned from the `render` function. Now write it to a file named `team.html` in the
-// `output` folder. You can use the variable `outputPath` above target this location.
-// Hint: you may need to check if the `output` folder exists and create it if it
-// does not.
-
-// HINT: each employee type (manager, engineer, or intern) has slightly different
-// information; write your code to ask different questions via inquirer depending on
-// employee type.
-
-// HINT: make sure to build out your classes first! Remember that your Manager, Engineer,
-// and Intern classes should all extend from a class named Employee; see the directions
-// for further information. Be sure to test out each class and verify it generates an 
-// object with the correct structure and methods. This structure will be crucial in order
-// for the provided `render` function to work!```
+// Read all html files , and then write to them.
+// Send to output/team.html, read all files and write to them. 

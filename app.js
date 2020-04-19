@@ -13,6 +13,8 @@ const render = require("./lib/htmlRenderer");
 let teamSize;
 let i = 0;
 
+let results = []
+
 function checkTeamSize(){
     if (i < teamSize){
         i++;
@@ -21,7 +23,15 @@ function checkTeamSize(){
     }else if (teamSize === 0) {
         console.log("This is not a very impressive team :(");
     }else{
+        console.log(results)
         console.log("Your team is built!")
+
+        employeeInfo = render(results);
+        fs.writeFile("./output/team.html", employeeInfo, err => {
+        if (err) {
+            throw err;
+        } console.log("Successfully written to team.html file");
+        })
     }
 }
 
@@ -56,14 +66,17 @@ function employees() {
             message: "What is your email address?",
             name: "email"
         }
-    ]);
+    ]).then ((res) => {
+        let employee = [res.name,res.id, res.email]
+        results.push(...employee)
+    })
 
 }
 
 async function mainQuestions() {
     try {
         await employees();
-        getRole()
+        role()
 
     } catch (err) {
         console.log(err);
@@ -72,13 +85,13 @@ async function mainQuestions() {
 
 totalEmployees()
 
-function getRole() {
+function role() {
 
     inquirer.prompt(
         {
             type: "checkbox",
             message: "Please select the following that best applies to you.",
-            name: "title",
+            name: "role",
             choices: [
                 "Manager",
                 "Engineer",
@@ -87,23 +100,26 @@ function getRole() {
         }
     ).then ((res) => {
 
-        let title = res.title.toString();
+        let role = (res.role).toString();
+        results.push(role)
 
-        if (title === "Manager"){
+        if (role === "Manager"){
             inquirer.prompt(
                 {
                     message: "What is your office number?",
-                    name: "office"
+                    name: "officeNumber"
                 }).then((data) => {
+                    results.push(data.officeNumber)
                     checkTeamSize()
-                    
+
                 })
-        }else if (title === "Engineer") {
+        }else if (role === "Engineer") {
             inquirer.prompt(
                 {
                     message: "What is your GitHub username?",
                     name: "github"
                 }).then((data) => {
+                    results.push(data.github)
                     checkTeamSize()
 
                 })
@@ -113,14 +129,13 @@ function getRole() {
                     message: "What is the name of your school?",
                     name: "school"
                 }).then((data) => {
+                    results.push(data.school)
                     checkTeamSize()
 
                 })
+                
         }
 
     });
 
 }
-
-// Read all html files , and then write to them.
-// Send to output/team.html, read all files and write to them. 

@@ -71,3 +71,7 @@ The project must generate a team.html page in the output directory, that display
 ## Preview
 
 ![](images/EmployeeSummary.gif)
+
+## Image
+
+![](images/EmployeeSummary)

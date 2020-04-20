@@ -74,4 +74,4 @@ The project must generate a team.html page in the output directory, that display
 
 ## Image
 
-![](images/EmployeeSummary)
+![](images/EmployeeSummary.png)

@@ -68,4 +68,4 @@ The project must generate a team.html page in the output directory, that display
 - ID
 - Role-specific property (School, link to GitHub profile, or office number)
 
-<!-- ![](Images/Readme_Generator.gif) -->
+![](Images/EmployeeSummary.gif)
